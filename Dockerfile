@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:latest  
 
 # Set environment variables
 ENV ANDROID_SDK_ROOT=/usr/lib/android-sdk
@@ -29,13 +29,15 @@ RUN apt-get update && apt-get upgrade -y && \
     clang \
     cmake \
     ninja-build \
+    libgtk-3-dev \
     pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 # install ssh
-RUN apt-get install -y \
-    gnu-which \
-    openssh-server
+# RUN apt-get install -y \
+#    gnu-which \
+#    openssh-server \
+#    passwd
 # Setup ssh
 RUN ssh-keygen -A && \
     echo "Port 22" >> /etc/ssh/sshd_config && \

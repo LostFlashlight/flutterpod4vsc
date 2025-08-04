@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="author" content="David Sebek"/>
+	<meta name="description" content="This article shows how to develop software in containers on Linux with the VSCodium code editor. For illustration, a Flatpak version of VSCodium is used to develop Rust software in a Podman container on Fedora Linux"/>
+	<meta name="keywords" content="Podman, container, Flatpak, Rust, Linux, immutable, containerized development, Fedora, openSUSE, Silverblue, MicroOS, Aeon, VS Code, VSCodium, Code - OSS"/>
+	<base href="./"/>
+	<link rel="stylesheet" type="text/css" href="data/css/compiled.css"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<link rel="apple-touch-icon" sizes="180x180" href="data/icons/apple-touch-icon-180x180.png"/>
+	<link rel="icon" type="image/png" sizes="512x512" href="data/icons/favicon-512x512.png"/>
+	<link rel="icon" type="image/png" sizes="192x192" href="data/icons/favicon-192x192.png"/>
+	<link rel="icon" type="image/png" sizes="180x180" href="data/icons/favicon-180x180.png"/>
+	<link rel="icon" type="image/png" sizes="150x150" href="data/icons/favicon-150x150.png"/>
+	<link rel="icon" type="image/png" sizes="144x144" href="data/icons/favicon-144x144.png"/>
+	<link rel="icon" type="image/png" sizes="96x96" href="data/icons/favicon-96x96.png"/>
+	<link rel="icon" type="image/png" sizes="48x48" href="data/icons/favicon-48x48.png"/>
+	<link rel="icon" type="image/png" sizes="32x32" href="data/icons/favicon-32x32.png"/>
+	<link rel="icon" type="image/png" sizes="16x16" href="data/icons/favicon-16x16.png"/>
+	<title>Develop in Containers with VSCodium - David's How-Tos</title>
+</head>
+
+<body>
+	<div id="header">
+		<ol class="breadcrumb">
+			<li><a href="." title="David's How-Tos">How-Tos</a></li>
+			<li>VSCodium and Containers</li>
+		</ol>
+	</div>
+
+	<div id="content">
+		<h1>Develop in Containers with VSCodium</h1>
+		<p>With the increasing popularity of immutable Linux operating systems, such as Fedora Silverblue or openSUSE Aeon (MicroOS), the software developer's workflow increasingly demands the use of containers for software development. It is no longer practical or even possible to install either the development toolchain or the code editor directly on the host operating system using traditional methods.</p>
+		<p><strong>Instead, applications like code editors are now installed in a sandbox via Flatpak, and they have limited access to the host operating system. Similarly, build tools and compilers are installed inside containers.</strong> Because Flatpak and containers isolate applications and build environments from the host operating system, it is easy to set up multiple build environments without having to install any additional software on the host operating system. But the sandboxing and isolation complicate the interaction between the source code, compilers, and code editors.</p>
+		<picture>
+			<source srcset="data/images/vscodium-containers/vscodium-set-up_d2.webp, data/images/vscodium-containers/vscodium-set-up.webp 2x" type="image/webp" />
+			<source srcset="data/images/vscodium-containers/vscodium-set-up_d2.png, data/images/vscodium-containers/vscodium-set-up.png 2x" type="image/png" />
+			<img
+				class="noborder"
+				srcset="data/images/vscodium-containers/vscodium-set-up_d2.png, data/images/vscodium-containers/vscodium-set-up.png 2x"
+				src="data/images/vscodium-containers/vscodium-set-up.png"
+				width="1052"
+				height="650"
+				alt="A screenshot of the VSCodium text editor showing Rust code built and executed inside a Podman container" />
+		</picture>
+		<p>In this article, I explore a way to develop Rust programs in a <strong>Podman container</strong> from a <strong>Flatpak version of the VSCodium editor</strong> on <strong>Fedora Linux version 38</strong>.</p>
+		<dl class="document-info">
+			<dt>Created</dt>
+				<dd>June 9, 2023</dd>
+		</dl>
+
+		<h2>References</h2>
+		<p>I used information from these articles:</p>
+		<ol>
+			<li><a href="https://raduzaharia.medium.com/using-the-vscode-flatpak-distribution-a275d59ff1c7" title="Article describing how to use containers from VS Code">https://raduzaharia.medium.com/using-the-vscode-flatpak-distribution-a275d59ff1c7</a></li>
+			<li><a href="https://www.garron.me/en/linux/sshd-no-hostkeys-available-exiting.html" title="Article showing how to set up SSH host keys">https://www.garron.me/en/linux/sshd-no-hostkeys-available-exiting.html</a></li>
+		</ol>
+
+		<h2>Install VSCodium</h2>
+		<p><strong>In this guide, I use the Flatpak version of the VSCodium code editor from Flathub.</strong> Note that VSCodium is also available as a traditional package from the <a href="https://vscodium.com/" title="VSCodium homepage">VSCodium official website</a> if you can't use Flatpak for any reason.</p>
+		<p>If you have the Flathub repository enabled, install <a href="https://flathub.org/apps/com.vscodium.codium" title="VSCodium on Flathub">VSCodium</a>:</p>
+		<pre class="command"><code class="user">flatpak install flathub com.vscodium.codium</code></pre>
+		<p>Flathub also offers the <a href="https://flathub.org/apps/com.visualstudio.code-oss" title="Code - OSS on Flathub">Code - OSS</a> editor that should work in the same way. But I strongly recommend using VSCodium instead. The Flatpak version of Code - OSS tends to be outdated. Moreover, the "Open Remote - SSH" extension only supports VSCodium and fails to automatically install the remote extension host in the target container if Code - OSS is used.</p>
+		<p>Note that <strong>I don't use Visual Studio Code (VS Code) in this guide</strong>. Although VS Code is based on an open-source codebase, the program that is published on the Microsoft website for download is proprietary and closed-source. Both VSCodium and Code - OSS are open-source software built from the open-source codebase of VS Code. They provide almost the same functionality as VS Code. VS Code adds telemetry collection, access to Microsoft's extension store, and possibly other changes.</p>
+
+		<h2>Prepare a Project Directory</h2>
+		<p>I don't want to store project files inside the container because I want to be able to destroy containers without losing my projects. <strong>Create a directory on the host OS that will be shared with the container.</strong> I create a Rust directory inside my home directory that will store my Rust projects.</p>
+		<pre class="command"><code class="user">mkdir ~/Rust</code></pre>
+		<p>I have an example Rust project named "exercise" in the Rust directory.</p>
+		<picture>
+			<source srcset="data/images/vscodium-containers/folder-set-up_d2.webp, data/images/vscodium-containers/folder-set-up.webp 2x" type="image/webp" />
+			<source srcset="data/images/vscodium-containers/folder-set-up_d2.png, data/images/vscodium-containers/folder-set-up.png 2x" type="image/png" />
+			<img
+				class="noborder"
+				srcset="data/images/vscodium-containers/folder-set-up_d2.png, data/images/vscodium-containers/folder-set-up.png 2x"
+				src="data/images/vscodium-containers/folder-set-up.png"
+				width="1012"
+				height="672"
+				alt="A screenshot of the Files window showing source files of a Rust project" />
+		</picture>
+
+		<h2>Set Up a Container</h2>
+		<p>Now I create a new container inside of which I will set up the Rust build environment. I use Podman to create containers. You can take a look at the <a href="https://containertoolbx.org/" title="Toolbox home page">Toolbox</a> and <a href="https://distrobox.privatedns.org/" title="Distrobox home page">Distrobox</a> tools if you want to easily set up containers for more complex scenarios such as GUI application development.</p>
+
+		<h3>Create a Container</h3>
+		<p><strong>Use Podman to create and start a new container that uses the latest Fedora Linux container image:</strong></p>
+		<pre class="command"><code class="user">podman run -it --name Rust -v ~/Rust/:/Rust:z -p [::1]:20202:22 fedora</code></pre>
+		<p>This command creates a new container named Rust that is based on the default Fedora Linux container image. The <code>-i</code> and <code>-t</code> switches attach an interactive console to the container so that we can run commands in the container. The <span class="filepath">~/Rust</span> folder from the host OS is made available in the container as <span class="filepath">/Rust</span>. The <code>:z</code> suffix sets up the necessary SELinux labels on the files so that the container can access them. Port 22 from the container is mapped to port 20202 on the host OS for SSH access that we will set up. The port is bound only to localhost (the ::1 IP address). Those who still need IPv4 can write <code>127.0.0.1</code> instead of <code>[::1]</code>. <strong>If the IP address was omitted, the port would be bound to all IP addresses on the host, and anyone on the network could connect to the container!</strong></p>
+		<p>To start the created container in the future, use this command:</p>
+		<pre class="command"><code class="user">podman start -ai Rust</code></pre>
+		<p>Note that although root is the default user inside the container, you don't have to worry about doing accidental damage to the host OS. The Podman container is unprivileged and runs with the permissions of the user that started the container.</p>
+
+		<h3>Install Updates in the Container</h3>
+		<p>Run this command inside the container to install any available updates:</p>
+		<pre class="command system2"><code class="root">dnf --refresh upgrade</code></pre>
+
+		<h3>Install Development Tools in the Container</h3>
+		<p>I want to install <a href="https://www.rust-lang.org/tools/install" title="Rust installation instructions">Rust</a> inside the container. You can set up anything you want (C++, Go, &hellip;).</p>
+		<pre class="command system2"><code class="root">dnf install gcc</code>
+<code class="root">curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></pre>
+		<p>The container can now create and build my Rust project:</p>
+		<picture>
+			<source srcset="data/images/vscodium-containers/podman-set-up_d2.webp, data/images/vscodium-containers/podman-set-up.webp 2x" type="image/webp" />
+			<source srcset="data/images/vscodium-containers/podman-set-up_d2.png, data/images/vscodium-containers/podman-set-up.png 2x" type="image/png" />
+			<img
+				class="noborder"
+				srcset="data/images/vscodium-containers/podman-set-up_d2.png, data/images/vscodium-containers/podman-set-up.png 2x"
+				src="data/images/vscodium-containers/podman-set-up.png"
+				width="708"
+				height="533"
+				alt="A screenshot of the Terminal with a Podman container showing that it can build a Rust project" />
+		</picture>
+
+		<h3>Install Other Required Packages</h3>
+		<p><strong>The VSCodium SSH extension will expect the <code>which</code> command to be present in the container.</strong> Install it now inside the container:</p>
+		<pre class="command system2"><code class="root">dnf install which</code></pre>
+
+		<h3>Set Up SSH Connection to the Container</h3>
+		<p>Microsoft has a proprietary VS Code extension that can connect to containers directly. That extension is proprietary and not available in the extension marketplace that VSCodium and Code - OSS editors use. Instead, I will use a free extension that can connect VSCodium to the Rust container via SSH. Therefore, I need to set up an SSH server inside the container.</p>
+		<p><strong>Install the SSH server inside the container:</strong></p>
+		<pre class="command system2"><code class="root">dnf install openssh-server</code></pre>
+		<p><strong>Edit the SSH server configuration to allow the login as the root user:</strong></p>
+		<pre class="command system2"><code class="root">vi /etc/ssh/sshd_config</code></pre>
+		<p>Add the following lines:</p>
+		<pre class="config system2"><code>Port 22
+PermitRootLogin yes</code></pre>
+		<p><strong>Generate host keys in the container:</strong></p>
+		<pre class="command system2"><code class="root">/usr/libexec/openssh/sshd-keygen rsa</code>
+<code class="root">/usr/libexec/openssh/sshd-keygen ecdsa</code>
+<code class="root">/usr/libexec/openssh/sshd-keygen ed25519</code></pre>
+		<p>An alternative way to generate the keys:</p>
+		<pre class="command system2"><code class="root">ssh-keygen -A</code></pre>
+		<p><strong>Set the root password in the container.</strong> By default, the root account is locked. Install the <span class="program">passwd</span> program and use it to create a new password:</p>
+		<pre class="command system2"><code class="root">sudo dnf install passwd</code>
+<code class="root">passwd root</code></pre>
+		<p><strong>Start the SSH server in the container</strong> (the <code>-D</code> parameter tells it to run in the foreground):</p>
+		<pre class="command system2"><code class="root">/usr/sbin/sshd -D</code></pre>
+		<p>The <code>-d</code> parameter can help with debugging if needed:</p>
+		<pre class="command system2"><code class="root">/usr/sbin/sshd -D -d</code></pre>
+
+		<h3>Test the SSH Connection From the Host</h3>
+		<p>Test that the host OS can connect to the container via SSH:</p>
+		<pre class="command"><code class="user">ssh -p 20202 root@localhost</code></pre>
+
+		<h3>Set Up Key-Based SSH Authentication (Optional)</h3>
+		<p>If you don't want to enter the password every time you connect to the container via SSH, you can either set an empty password for the root user in the container or set up a key-based SSH authentication. I don't recommend having passwordless access to the container because other users on the host OS could SSH into the container. So I use key-based authentication instead.</p>
+		<p>First, create an SSH key on the host OS if the key doesn't exist already:</p>
+		<pre class="command"><code class="user">ssh-keygen -t ed25519</code></pre>
+		<p>Copy the public part of the key from the host OS to the container:</p>
+		<pre class="command"><code class="user">ssh-copy-id -i ~/.ssh/id_ed25519.pub -p 20202 root@localhost</code></pre>
+		<p>In the container, disable password authentication for the root user because it is no longer needed:</p>
+		<pre class="command system2"><code class="root">passwd -l root</code></pre>
+		<p>From the host OS, test that you can connect to the container via SSH without a password:</p>
+		<pre class="command"><code class="user">ssh -p 20202 root@localhost</code></pre>
+
+		<h2>Connect to the Container from VSCodium</h2>
+		<p>In VSCodium, <strong>Install the "Open Remote - SSH" extension</strong> published by jeanp413.</p>
+		<picture>
+			<source srcset="data/images/vscodium-containers/ssh-extension_d2.webp, data/images/vscodium-containers/ssh-extension.webp 2x" type="image/webp" />
+			<source srcset="data/images/vscodium-containers/ssh-extension_d2.png, data/images/vscodium-containers/ssh-extension.png 2x" type="image/png" />
+			<img
+				srcset="data/images/vscodium-containers/ssh-extension_d2.png, data/images/vscodium-containers/ssh-extension.png 2x"
+				src="data/images/vscodium-containers/ssh-extension.png"
+				width="304"
+				height="307"
+				alt="A screenshot of the VSCodium panel with the Open Remote - SSH extension highlighted" />
+		</picture>
+		<p><strong>Configure the details of the SSH connection in the extension settings.</strong> Because the extension fails to resolve the <code>localhost</code> hostname into an IPv6 address, I specify the IPv6 address explicitly as the <code>HostName</code> value. The configuration then looks like this:</p>
+		<pre class="config"><code>Host rust
+    HostName ::1
+    User root
+    Port 20202</code></pre>
+		<p>Finally, <strong>connect to the configured SSH target</strong>.</p>
+		<picture>
+			<source srcset="data/images/vscodium-containers/ssh-extension-config-connect_d2.webp, data/images/vscodium-containers/ssh-extension-config-connect.webp 2x" type="image/webp" />
+			<source srcset="data/images/vscodium-containers/ssh-extension-config-connect_d2.png, data/images/vscodium-containers/ssh-extension-config-connect.png 2x" type="image/png" />
+			<img
+				srcset="data/images/vscodium-containers/ssh-extension-config-connect_d2.png, data/images/vscodium-containers/ssh-extension-config-connect.png 2x"
+				src="data/images/vscodium-containers/ssh-extension-config-connect.png"
+				width="660"
+				height="315"
+				alt="A screenshot of VSCodium showing the configuration of the Open Remote - SSH extension and a highlighted button to create a connection" />
+		</picture>
+
+		<h2>Install Any Additional Extensions</h2>
+		<p>Install any extensions that will help you with your project. For Rust, I install:</p>
+		<ul>
+			<li>rust-analyzer (rust-lang)</li>
+			<li>CodeLLDB (vadimcn)</li>
+		</ul>
+
+		<h2>The Result</h2>
+		<p>If everything went well, <strong>you can write, build, run, and debug code in the container directly from VSCodium</strong>. Tasks triggered in the editor will be executed in the container.</p>
+		<p>It's time to celebrate!</p>
+		<picture>
+			<source srcset="data/images/vscodium-containers/final-result_d2.webp, data/images/vscodium-containers/final-result.webp 2x" type="image/webp" />
+			<source srcset="data/images/vscodium-containers/final-result_d2.png, data/images/vscodium-containers/final-result.png 2x" type="image/png" />
+			<img
+				srcset="data/images/vscodium-containers/final-result_d2.png, data/images/vscodium-containers/final-result.png 2x"
+				src="data/images/vscodium-containers/final-result.png"
+				width="1024"
+				height="579"
+				alt="A screenshot of VSCodium showing Rust code compiled in a container" />
+		</picture>
+
+	</div>
+
+	<div id="footer">
+		<dl class="footer-info">
+			<dt>Author</dt>
+				<dd>David Sebek</dd>
+			<dt>Copyright</dt>
+				<dd>All Rights Reserved</dd>
+			<dt>Year</dt>
+				<dd>2023</dd>
+		</dl>
+	</div>
+</body>
+</html>
