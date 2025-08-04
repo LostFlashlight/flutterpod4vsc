@@ -33,7 +33,7 @@ RUN apt-get update && apt-get upgrade -y && \
     pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
- install ssh
+ # install ssh
  RUN apt-get install -y \
     gnu-which \
     openssh-server \
