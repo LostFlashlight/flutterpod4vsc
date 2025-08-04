@@ -33,12 +33,9 @@ RUN apt-get update && apt-get upgrade -y && \
     pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
- # install ssh
- RUN apt-get install -y \
-    gnu-which \
-    openssh-server \
-    passwd
 # Setup ssh
+RUN apt-get updat $$ \
+    apt get install openssh-server
 RUN ssh-keygen -A && \
     echo "Port 22" >> /etc/ssh/sshd_config && \
     echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
