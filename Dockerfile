@@ -34,12 +34,12 @@ RUN apt-get update && apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Setup ssh
-RUN apt-get updat $$ \
-    apt get install openssh-server
+RUN apt-get update && \
+    apt-get install -y openssh-server
 RUN ssh-keygen -A && \
     echo "Port 22" >> /etc/ssh/sshd_config && \
     echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
-
+RUN mkdir /run/sshd # needed for sshd to not freak out.
 # Add flutter to safe directory in git
 RUN git config --global --add safe.directory /usr/lib/flutter
 
