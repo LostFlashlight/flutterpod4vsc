@@ -33,11 +33,11 @@ RUN apt-get update && apt-get upgrade -y && \
     pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
-# install ssh
-# RUN apt-get install -y \
-#    gnu-which \
-#    openssh-server \
-#    passwd
+ install ssh
+ RUN apt-get install -y \
+    gnu-which \
+    openssh-server \
+    passwd
 # Setup ssh
 RUN ssh-keygen -A && \
     echo "Port 22" >> /etc/ssh/sshd_config && \
