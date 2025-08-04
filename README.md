@@ -22,8 +22,5 @@ cd flutterpod4vsc
 
 ## inspiration:
 https://howtos.davidsebek.com/vscodium-containers.html
-https://blog.devops.dev/developing-flutter-applications-inside-a-devcontainer-4b13de5369e2
 
-# probably bullshit:
-if the setup script fails please follow the following tutoreal to get podman to run continuosly:
-https://access.redhat.com/solutions/6512011
+https://blog.devops.dev/developing-flutter-applications-inside-a-devcontainer-4b13de5369e2
