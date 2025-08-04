@@ -68,5 +68,3 @@ RUN mkdir -p ${FLUTTER_SDK_ROOT} && \
 # Disable Flutter telemetry
 RUN flutter --disable-analytics
 
-# Default shell to bash
-SHELL ["/bin/bash", "-c"]
