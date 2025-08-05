@@ -23,3 +23,6 @@ echo "Host FlutterDevContaier" >> $HOME/.ssh/config
 echo "    HostName ::1" >> $HOME/.ssh/config
 echo "    User root" >> $HOME/.ssh/config
 echo "    Port 20202" >> $HOME/.ssh/config
+
+## install vsc ssh extension 
+flatpak run com.vscodium.codium --install-extension 3timeslazy.vscodium-devpodcontainers
