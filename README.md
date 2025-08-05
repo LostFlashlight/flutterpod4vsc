@@ -11,7 +11,7 @@ the script will preinstall vscodium but the setup should work with oss-code as w
 ## installation
 clone the repo
 ```
-git clone
+git clone https://github.com/LostFlashlight/flutterpod4vsc.git
 ```
 Then just run the devEnv script and you should be good to go
 
