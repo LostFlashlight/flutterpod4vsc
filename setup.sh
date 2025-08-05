@@ -25,4 +25,5 @@ echo "    User root" >> $HOME/.ssh/config
 echo "    Port 20202" >> $HOME/.ssh/config
 
 ## install vsc ssh extension 
+flatpak install com.vscodium.codium
 flatpak run com.vscodium.codium --install-extension 3timeslazy.vscodium-devpodcontainers
