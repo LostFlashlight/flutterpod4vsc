@@ -17,3 +17,9 @@ podman exec FlutterDevContainer /usr/sbin/sshd
 ssh-keygen -t ed25519
 ## copy it into the container the Password will be needed
 ssh-copy-id -i ~/.ssh/id_ed25519.pub -p 20202 root@::1
+
+##Preconfigure ssh
+echo "Host FlutterDevContaier" >> $HOME/.ssh/config
+echo "    HostName ::1" >> $HOME/.ssh/config
+echo "    User root" >> $HOME/.ssh/config
+echo "    Port 20202" >> $HOME/.ssh/config
