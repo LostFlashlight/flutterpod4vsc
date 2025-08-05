@@ -2,8 +2,8 @@
 # build the image out of the Docker file
 podman build docker -t flutter
 # initialize the container and open an port for ssh
-podman run -d -i --privileged -v /dev/bus/usb:/dev/bus/usb --name FlutterDevContainer --replace -v ~/flutter:/flutter:z -p [::1]:20202:22 flutterdev
-
+mkdir ~/flutter
+podman run -d -i --privileged -v /dev/bus/usb:/dev/bus/usb --name FlutterDevContainer --replace -v ~/flutter:/flutter:z -p [::1]:20202:22 localhost/flutter
 #make the container reachable with ssh
 ## set a temporary Password to log in from ssh and launch ssh
 echo "please set the root password for the container"
