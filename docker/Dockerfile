@@ -71,6 +71,4 @@ RUN ln -s /usr/lib/flutter/bin/dart /bin/dart
 RUN flutter --disable-analytics
 
 # set display for ssh season
-RUN echo "if [ -f ~/.bashrc ]; then" >> /root/.bashrc
 RUN echo "   export DISPLAY=:0" >> /root/.bashrc
-RUN echo "fi" >> /root/.bashrc
