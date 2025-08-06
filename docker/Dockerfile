@@ -37,7 +37,7 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN apt-get update && \
     apt-get install -y openssh-server
 RUN ssh-keygen -A && \
-    echo "Port 22" >> /etc/ssh/sshd_config && \
+    echo "Port 20202" >> /etc/ssh/sshd_config && \
     echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 RUN mkdir /run/sshd # needed for sshd to not freak out.
 

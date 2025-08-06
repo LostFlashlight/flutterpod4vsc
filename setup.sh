@@ -8,7 +8,7 @@ xhost +
 podman run -d --privileged \
 -v /etc/localtime:/etc/localtime:ro \
 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY \
---security-opt label=type:container_runtime_t \
+--security-opt label=disable \
 -v ~/flutter:/flutter:z \
 --net=host \
 --replace \
