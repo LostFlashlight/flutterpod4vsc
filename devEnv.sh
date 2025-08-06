@@ -1,4 +1,5 @@
 #!/bin/bash
+xhost +"local:podman@"
 startOutput=$(podman start FlutterDevContainer)
 echo $startOutput
 if [ "$startOutput" == "FlutterDevContainer" ]; then
