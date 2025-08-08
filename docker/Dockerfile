@@ -4,7 +4,7 @@ FROM ubuntu:latest
 ENV ANDROID_SDK_ROOT=/usr/lib/android-sdk
 
 ENV FLUTTER_SDK_ROOT=/usr/lib/flutter
-ENV FLUTTER_SDK_VERSION=3.27.1-stable
+ENV FLUTTER_SDK_VERSION=3.32.8-stable
 
 # Include flutter and android tools in path
 ENV PATH="${PATH}:${FLUTTER_SDK_ROOT}/bin:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools"
