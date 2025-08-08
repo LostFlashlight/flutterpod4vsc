@@ -1,11 +1,11 @@
 #!/bin/bash
 # build the image out of the Docker file
-podman build docker -t flutter
+podman build docker --build-arg DISPLAY=$DISPLAY -t flutter
 # initialize the container and open an port for ssh
 mkdir ~/flutter
 podman run -d --privileged \
   -v /etc/localtime:/etc/localtime:ro \
-  -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:0 --security-opt label=disable \
+  -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY --security-opt label=disable \
   -v ~/flutter:/flutter:z \
   --net=host \
   --replace \
