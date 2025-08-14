@@ -4,6 +4,7 @@ podman build docker --build-arg DISPLAY=$DISPLAY -t flutter
 # initialize the container and open an port for ssh
 mkdir ~/flutter
 podman run -d --privileged \
+  -v /dev/bus/usb/:/dev/bus/usb -v /etc/udev/rules.d/:/etc/udev/rules.d \
   -v /etc/localtime:/etc/localtime:ro \
   -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY --security-opt label=disable \
   -v ~/flutter:/flutter:z \
