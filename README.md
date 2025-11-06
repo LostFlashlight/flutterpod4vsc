@@ -1,5 +1,5 @@
 # FlutterPod4VSCodium
-a little script to get the funktionality of a flutter dev container one the opensource forces of Visual-Studio-Code
+a little script to get the funktionality of a flutter dev container one the opensource forkes of Visual-Studio-Code
 the script will preinstall vscodium but the setup should work with oss-code as well. 
 ## features:
 - onecommand installer
